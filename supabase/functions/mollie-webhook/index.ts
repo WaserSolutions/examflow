@@ -4,23 +4,33 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const MOLLIE_API_KEY = Deno.env.get('MOLLIE_API_KEY')!
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-const APP_URL = 'https://wasersolutions.github.io/examflow/'
+const APP_URL = 'https://examflowapp.waser.solutions/'
 
 serve(async (req) => {
+  if (req.method !== 'POST') {
+    return new Response('Method not allowed', { status: 405 })
+  }
+
   try {
-    // Mollie sends payment ID as form-encoded body
     const body = await req.text()
     const params = new URLSearchParams(body)
     const paymentId = params.get('id')
 
-    if (!paymentId) {
-      return new Response('Missing payment ID', { status: 400 })
+    // Validate payment ID format (Mollie IDs are tr_ followed by alphanumeric)
+    if (!paymentId || !/^tr_[a-zA-Z0-9]+$/.test(paymentId)) {
+      return new Response('Invalid payment ID', { status: 400 })
     }
 
-    // Fetch payment details from Mollie
+    // Verify payment with Mollie API (this IS the authentication:
+    // only real Mollie payments will return valid data with our API key)
     const mollieRes = await fetch(`https://api.mollie.com/v2/payments/${paymentId}`, {
       headers: { 'Authorization': `Bearer ${MOLLIE_API_KEY}` },
     })
+
+    if (!mollieRes.ok) {
+      return new Response('Payment not found', { status: 400 })
+    }
+
     const payment = await mollieRes.json()
 
     // Only proceed if payment is actually paid
@@ -29,25 +39,43 @@ serve(async (req) => {
     }
 
     const email = payment.metadata?.email
-    if (!email) {
-      return new Response('No email in metadata', { status: 400 })
+    if (!email || !email.includes('@')) {
+      return new Response('No valid email in metadata', { status: 400 })
     }
 
-    // Create Supabase admin client
+    // Verify amount matches expected price
+    if (payment.amount?.value !== '19.00' || payment.amount?.currency !== 'CHF') {
+      return new Response('Invalid payment amount', { status: 400 })
+    }
+
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false }
     })
 
-    // Check if user already exists
-    const { data: existingUsers } = await supabase.auth.admin.listUsers()
-    const existingUser = existingUsers?.users?.find(u => u.email === email)
+    // Check if this payment was already processed (idempotency)
+    const { data: existingPayment } = await supabase
+      .from('payments')
+      .select('id')
+      .eq('mollie_payment_id', paymentId)
+      .maybeSingle()
+
+    if (existingPayment) {
+      return new Response('OK', { status: 200 })
+    }
+
+    // Find user by email efficiently (not listUsers)
+    const { data: userList } = await supabase.auth.admin.listUsers({
+      page: 1,
+      perPage: 1,
+      filter: email
+    })
+    const existingUser = userList?.users?.[0]
 
     let userId: string
 
     if (existingUser) {
       userId = existingUser.id
     } else {
-      // Create new user
       const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
         email,
         email_confirm: true,
@@ -69,25 +97,6 @@ serve(async (req) => {
       currency: 'CHF',
       status: 'paid',
     }, { onConflict: 'mollie_payment_id' })
-
-    // Send magic link login email
-    await supabase.auth.admin.generateLink({
-      type: 'magiclink',
-      email,
-      options: { redirectTo: APP_URL }
-    })
-
-    // Also trigger an OTP email so user gets an actual email
-    // Use a separate client with anon key for this
-    const { error: otpError } = await supabase.auth.admin.generateLink({
-      type: 'magiclink',
-      email,
-      options: { redirectTo: APP_URL }
-    })
-
-    if (otpError) {
-      console.error('Error sending magic link:', otpError)
-    }
 
     return new Response('OK', { status: 200 })
 
