@@ -63,13 +63,14 @@ serve(async (req) => {
       return new Response('OK', { status: 200 })
     }
 
-    // Find user by email efficiently (not listUsers)
+    // Find user by email efficiently
     const { data: userList } = await supabase.auth.admin.listUsers({
       page: 1,
       perPage: 1,
       filter: email
     })
-    const existingUser = userList?.users?.[0]
+    // Exact match guard (filter is fuzzy text search)
+    const existingUser = userList?.users?.find(u => u.email === email)
 
     let userId: string
 
