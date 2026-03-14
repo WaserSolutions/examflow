@@ -1,4 +1,4 @@
-const CACHE_NAME = 'examflow-v3';
+const CACHE_NAME = 'examflow-v4';
 const ASSETS = ['/', '/examflow/', '/examflow/index.html', '/examflow/manifest.json'];
 
 self.addEventListener('install', e => {
