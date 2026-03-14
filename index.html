@@ -588,12 +588,15 @@
                 <div class="purchase-form">
                     <input type="email" id="purchaseEmail" placeholder="Deine E-Mail-Adresse" autocomplete="email">
                     <div class="purchase-error" id="purchaseError"></div>
-                    <button class="btn-buy" id="btnBuy" onclick="startPurchase()">Jetzt kaufen mit Twint</button>
+                    <button class="btn-buy" id="btnBuy" onclick="startPurchase()">Jetzt holen</button>
                 </div>
             </div>
 
             <div class="login-link">
                 Bereits gekauft? <a onclick="showLogin()">Hier einloggen</a>
+            </div>
+            <div class="login-link" style="margin-top:0.5rem;">
+                <a href="https://examflow.waser.solutions" style="color:var(--muted);text-decoration:none;">&#8592; Zurück zur Webseite</a>
             </div>
         </div>
 
@@ -838,7 +841,7 @@
                 errEl.textContent = translateError(e.message);
                 errEl.style.display = 'block';
                 btn.disabled = false;
-                btn.textContent = 'Jetzt kaufen mit Twint';
+                btn.textContent = 'Jetzt holen';
             }
         }
 
