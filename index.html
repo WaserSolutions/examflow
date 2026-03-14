@@ -36,8 +36,24 @@
         .container {
             max-width: 500px;
             margin: 0 auto;
-            padding: 1.5rem 1rem;
-            padding-bottom: env(safe-area-inset-bottom, 1.5rem);
+            padding: 1rem;
+            padding-top: calc(2.5rem + env(safe-area-inset-top, 0px));
+            padding-bottom: env(safe-area-inset-bottom, 1rem);
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container > *:not(.footer) { flex-shrink: 0; }
+
+        .footer {
+            margin-top: auto;
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #3a3d4a;
+            letter-spacing: 0.02em;
         }
 
         .logo {
@@ -627,6 +643,8 @@
                 <button class="btn btn-primary" onclick="resetTimer()" style="max-width:300px;margin:0 auto;display:block;">Neue Prüfung einrichten</button>
             </div>
         </div>
+
+        <div class="footer">v1.0 · by Daniela Waser</div>
     </div>
 
     <script>
