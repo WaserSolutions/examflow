@@ -1,5 +1,5 @@
-const CACHE_NAME = 'examflow-v4';
-const ASSETS = ['/', '/examflow/', '/examflow/index.html', '/examflow/manifest.json'];
+const CACHE_NAME = 'examflow-v5';
+const ASSETS = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(ASSETS)));
