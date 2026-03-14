@@ -610,12 +610,22 @@
         <div id="loginView">
             <div class="login-card">
                 <h2>Willkommen zurück</h2>
-                <p>Gib deine E-Mail-Adresse ein und wir senden dir einen Login-Link.</p>
-                <input type="email" id="loginEmail" placeholder="Deine E-Mail-Adresse" autocomplete="email">
-                <div class="login-error" id="loginError"></div>
-                <button class="btn btn-primary" onclick="handleLogin()" style="margin-top:0.5rem;">Login-Link senden</button>
-                <div class="login-success" id="loginSuccess">
-                    Login-Link wurde gesendet! Prüfe dein E-Mail-Postfach und klicke auf den Link.
+                <!-- Step 1: Email -->
+                <div id="loginStep1">
+                    <p>Gib deine E-Mail-Adresse ein und wir senden dir einen 6-stelligen Code.</p>
+                    <input type="email" id="loginEmail" placeholder="Deine E-Mail-Adresse" autocomplete="email">
+                    <div class="login-error" id="loginError"></div>
+                    <button class="btn btn-primary" onclick="handleLogin()" style="margin-top:0.5rem;">Code senden</button>
+                </div>
+                <!-- Step 2: OTP Code -->
+                <div id="loginStep2" style="display:none;">
+                    <p>Wir haben einen 6-stelligen Code an <strong id="loginEmailDisplay"></strong> gesendet.</p>
+                    <input type="text" id="loginOtp" placeholder="6-stelliger Code" maxlength="6" inputmode="numeric" autocomplete="one-time-code" style="text-align:center;font-size:1.5rem;letter-spacing:0.5rem;font-weight:700;">
+                    <div class="login-error" id="otpError"></div>
+                    <button class="btn btn-primary" onclick="verifyOtp()" style="margin-top:0.5rem;">Einloggen</button>
+                    <div style="margin-top:1rem;">
+                        <a href="javascript:void(0)" onclick="backToEmail()" style="color:var(--muted);font-size:0.8rem;text-decoration:none;">Andere E-Mail verwenden</a>
+                    </div>
                 </div>
             </div>
             <div class="back-link">
@@ -628,7 +638,7 @@
             <div class="success-card">
                 <div class="success-icon" style="color:var(--success);">&#10003;</div>
                 <h2>Zahlung erfolgreich!</h2>
-                <p>Vielen Dank für deinen Kauf. Wir haben dir einen Login-Link an deine E-Mail-Adresse gesendet. Prüfe dein Postfach und klicke auf den Link, um ExamFlow zu starten.</p>
+                <p>Vielen Dank für deinen Kauf. Gehe zum Login und fordere einen Code an, um ExamFlow zu starten.</p>
                 <button class="btn btn-primary" onclick="showLogin()">Zum Login</button>
             </div>
         </div>
@@ -852,10 +862,11 @@
         }
 
         // ===== LOGIN =====
+        let loginEmailValue = '';
+
         async function handleLogin() {
             const email = document.getElementById('loginEmail').value.trim();
             const errEl = document.getElementById('loginError');
-            const successEl = document.getElementById('loginSuccess');
 
             if (!email || !email.includes('@')) {
                 errEl.textContent = 'Bitte gib eine gültige E-Mail-Adresse ein.';
@@ -865,17 +876,48 @@
 
             errEl.style.display = 'none';
 
-            const { error } = await sb.auth.signInWithOtp({
-                email,
-                options: { emailRedirectTo: APP_URL }
-            });
+            const { error } = await sb.auth.signInWithOtp({ email });
 
             if (error) {
                 errEl.textContent = translateError(error.message);
                 errEl.style.display = 'block';
             } else {
-                successEl.style.display = 'block';
+                loginEmailValue = email;
+                document.getElementById('loginEmailDisplay').textContent = email;
+                document.getElementById('loginStep1').style.display = 'none';
+                document.getElementById('loginStep2').style.display = 'block';
             }
+        }
+
+        async function verifyOtp() {
+            const otp = document.getElementById('loginOtp').value.trim();
+            const errEl = document.getElementById('otpError');
+
+            if (!otp || otp.length !== 6) {
+                errEl.textContent = 'Bitte gib den 6-stelligen Code ein.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            errEl.style.display = 'none';
+
+            const { error } = await sb.auth.verifyOtp({
+                email: loginEmailValue,
+                token: otp,
+                type: 'email'
+            });
+
+            if (error) {
+                errEl.textContent = translateError(error.message);
+                errEl.style.display = 'block';
+            }
+        }
+
+        function backToEmail() {
+            document.getElementById('loginStep1').style.display = 'block';
+            document.getElementById('loginStep2').style.display = 'none';
+            document.getElementById('loginOtp').value = '';
+            document.getElementById('otpError').style.display = 'none';
         }
 
         // ===== LOGOUT =====
