@@ -1,4 +1,4 @@
-const CACHE_NAME = 'examflow-v1';
+const CACHE_NAME = 'examflow-v2';
 const ASSETS = ['/', '/examflow/', '/examflow/index.html', '/examflow/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -13,6 +13,9 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  if (e.request.url.includes('supabase.co') || e.request.url.includes('mollie.com')) {
+    return;
+  }
   e.respondWith(
     fetch(e.request).catch(() => caches.match(e.request))
   );

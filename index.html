@@ -9,6 +9,7 @@
     <meta name="theme-color" content="#0f1117">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -64,16 +65,9 @@
             margin-bottom: 1.8rem;
         }
 
-        .logo-icon {
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0;
-        }
+        .logo-icon { width: 48px; height: 48px; flex-shrink: 0; }
 
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
+        .logo-text { display: flex; flex-direction: column; }
 
         .logo-name {
             font-size: 1.6rem;
@@ -97,7 +91,232 @@
             margin-top: 0.1rem;
         }
 
-        /* Setup */
+        /* ===== Landing Page ===== */
+        #landingView { display: none; }
+
+        .hero-text {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .hero-text h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            line-height: 1.3;
+        }
+
+        .hero-text p {
+            color: var(--muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .features {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.8rem 1rem;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .feature-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .feature-text { font-size: 0.85rem; color: var(--text); }
+
+        .price-card {
+            background: var(--card);
+            border: 2px solid var(--accent);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .price-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .price-label {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+        }
+
+        .purchase-form {
+            margin-top: 1.5rem;
+        }
+
+        .purchase-form input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .purchase-error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 0.5rem;
+            display: none;
+        }
+
+        .btn-buy {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            color: white;
+            -webkit-appearance: none;
+            transition: all 0.2s;
+        }
+
+        .btn-buy:active { transform: scale(0.98); }
+        .btn-buy:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .login-link {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .login-link a {
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* ===== Login View ===== */
+        #loginView { display: none; }
+
+        .login-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .login-card h2 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-card p {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.4;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .login-error {
+            color: var(--danger);
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            display: none;
+        }
+
+        .login-success {
+            color: var(--success);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .back-link a {
+            color: var(--accent);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* ===== Payment Success View ===== */
+        #paymentSuccessView { display: none; }
+
+        .success-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-card h2 {
+            font-size: 1.3rem;
+            color: var(--success);
+            margin-bottom: 0.5rem;
+        }
+
+        .success-card p {
+            color: var(--muted);
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== Logout Button ===== */
+        .logout-btn {
+            position: absolute;
+            top: calc(0.8rem + env(safe-area-inset-top, 0px));
+            right: 1rem;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.75rem;
+            padding: 0.4rem 0.7rem;
+            border-radius: 8px;
+            cursor: pointer;
+            display: none;
+            -webkit-appearance: none;
+        }
+
+        .logout-btn:active { color: var(--text); border-color: var(--muted); }
+
+        /* ===== Setup ===== */
         .setup-card {
             background: var(--card);
             border: 1px solid var(--border);
@@ -132,149 +351,74 @@
             border: 1px solid var(--border);
         }
 
-        .topic-color {
-            width: 14px; height: 14px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
+        .topic-color { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
 
         .topic-row input.topic-name {
-            flex: 1;
-            border: none;
-            background: transparent;
-            min-width: 0;
-            padding: 0.5rem;
+            flex: 1; border: none; background: transparent; min-width: 0; padding: 0.5rem;
         }
 
-        .minutes-control {
-            display: flex;
-            align-items: center;
-            gap: 0;
-            flex-shrink: 0;
-        }
+        .minutes-control { display: flex; align-items: center; gap: 0; flex-shrink: 0; }
 
         .btn-pm {
-            width: 36px;
-            height: 36px;
-            border: 1px solid var(--border);
-            background: var(--card);
-            color: var(--text);
-            font-size: 1.2rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.15s;
-            -webkit-appearance: none;
-            user-select: none;
+            width: 36px; height: 36px;
+            border: 1px solid var(--border); background: var(--card); color: var(--text);
+            font-size: 1.2rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.15s; -webkit-appearance: none; user-select: none;
         }
-
         .btn-pm:first-child { border-radius: 8px 0 0 8px; }
         .btn-pm:last-child { border-radius: 0 8px 8px 0; }
-
         .btn-pm:active { background: var(--accent); color: white; }
 
         .minutes-display {
-            width: 40px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 40px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
             background: var(--bg);
-            border-top: 1px solid var(--border);
-            border-bottom: 1px solid var(--border);
-            font-size: 0.95rem;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-            user-select: none;
+            border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+            font-size: 0.95rem; font-weight: 600; font-variant-numeric: tabular-nums; user-select: none;
         }
 
-        .minutes-label {
-            font-size: 0.7rem;
-            color: var(--muted);
-            margin-left: 0.3rem;
-            flex-shrink: 0;
-        }
+        .minutes-label { font-size: 0.7rem; color: var(--muted); margin-left: 0.3rem; flex-shrink: 0; }
 
         .btn-remove {
             background: none; border: none; color: var(--muted);
             cursor: pointer; font-size: 1.1rem; padding: 0.4rem;
-            border-radius: 6px; transition: all 0.2s;
-            flex-shrink: 0;
+            border-radius: 6px; transition: all 0.2s; flex-shrink: 0;
         }
         .btn-remove:active { color: var(--danger); background: rgba(239,68,68,0.1); }
 
         .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            -webkit-appearance: none;
+            padding: 0.75rem 1.5rem; border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: 600; cursor: pointer;
+            transition: all 0.2s; -webkit-appearance: none;
         }
 
-        .btn-secondary {
-            background: var(--bg);
-            color: var(--text);
-            border: 1px dashed var(--border);
-        }
+        .btn-secondary { background: var(--bg); color: var(--text); border: 1px dashed var(--border); }
         .btn-secondary:active { border-color: var(--accent); color: var(--accent); }
 
         .btn-primary {
-            background: linear-gradient(135deg, #6366f1, #818cf8);
-            color: white;
-            width: 100%;
-            padding: 1rem;
-            font-size: 1.1rem;
-            margin-top: 1rem;
+            background: linear-gradient(135deg, #6366f1, #818cf8); color: white;
+            width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;
         }
         .btn-primary:active { transform: scale(0.98); }
 
         .total-time-display {
-            text-align: center;
-            padding: 0.7rem;
-            background: var(--card);
-            border-radius: 10px;
-            margin-top: 0.8rem;
-            font-size: 0.9rem;
-            color: var(--muted);
-            border: 1px solid var(--border);
+            text-align: center; padding: 0.7rem; background: var(--card);
+            border-radius: 10px; margin-top: 0.8rem; font-size: 0.9rem;
+            color: var(--muted); border: 1px solid var(--border);
         }
         .total-time-display span { color: var(--text); font-weight: 600; }
 
-        /* Countdown Overlay */
-        #countdownView {
-            display: none;
-            text-align: center;
-            padding-top: 15vh;
-        }
-
-        .countdown-label {
-            font-size: 1rem;
-            color: var(--muted);
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
+        /* Countdown */
+        #countdownView { display: none; text-align: center; padding-top: 15vh; }
+        .countdown-label { font-size: 1rem; color: var(--muted); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 0.1em; }
         .countdown-number {
-            font-size: 8rem;
-            font-weight: 700;
-            line-height: 1;
+            font-size: 8rem; font-weight: 700; line-height: 1;
             background: linear-gradient(135deg, #6366f1, #a78bfa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             animation: countdownPop 1s ease-in-out infinite;
         }
-
-        .countdown-hint {
-            font-size: 0.85rem;
-            color: var(--muted);
-            margin-top: 2rem;
-        }
+        .countdown-hint { font-size: 0.85rem; color: var(--muted); margin-top: 2rem; }
 
         @keyframes countdownPop {
             0% { transform: scale(1); opacity: 1; }
@@ -284,246 +428,77 @@
 
         /* Timer View */
         #timerView { display: none; }
+        #setupView { display: none; }
 
-        .timer-header {
-            text-align: center;
-            margin-bottom: 1.2rem;
-        }
+        .timer-header { text-align: center; margin-bottom: 1.2rem; }
+        .current-topic-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+        .current-topic-name { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.2rem; transition: color 0.3s; }
+        .current-topic-progress { font-size: 0.8rem; color: var(--muted); }
 
-        .current-topic-label {
-            font-size: 0.75rem;
-            color: var(--muted);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 0.3rem;
-        }
+        .timer-circle-container { display: flex; justify-content: center; margin: 1rem 0; }
+        .timer-circle { width: 240px; height: 240px; position: relative; }
+        .timer-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .timer-circle .bg-ring { fill: none; stroke: var(--border); stroke-width: 8; }
+        .timer-circle .progress-ring { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 0.3s ease, stroke 0.3s; }
 
-        .current-topic-name {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 0.2rem;
-            transition: color 0.3s;
-        }
+        .timer-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .timer-display .time-remaining { font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; line-height: 1; }
+        .timer-display .time-label { font-size: 0.7rem; color: var(--muted); margin-top: 0.2rem; }
+        .timer-display .total-remaining { font-size: 0.9rem; color: var(--muted); margin-top: 0.6rem; font-variant-numeric: tabular-nums; }
 
-        .current-topic-progress {
-            font-size: 0.8rem;
-            color: var(--muted);
-        }
-
-        /* Circular Timer */
-        .timer-circle-container {
-            display: flex;
-            justify-content: center;
-            margin: 1rem 0;
-        }
-
-        .timer-circle {
-            width: 240px;
-            height: 240px;
-            position: relative;
-        }
-
-        .timer-circle svg {
-            width: 100%;
-            height: 100%;
-            transform: rotate(-90deg);
-        }
-
-        .timer-circle .bg-ring {
-            fill: none;
-            stroke: var(--border);
-            stroke-width: 8;
-        }
-
-        .timer-circle .progress-ring {
-            fill: none;
-            stroke-width: 8;
-            stroke-linecap: round;
-            transition: stroke-dashoffset 0.3s ease, stroke 0.3s;
-        }
-
-        .timer-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-        }
-
-        .timer-display .time-remaining {
-            font-size: 3rem;
-            font-weight: 700;
-            font-variant-numeric: tabular-nums;
-            letter-spacing: -0.02em;
-            line-height: 1;
-        }
-
-        .timer-display .time-label {
-            font-size: 0.7rem;
-            color: var(--muted);
-            margin-top: 0.2rem;
-        }
-
-        .timer-display .total-remaining {
-            font-size: 0.9rem;
-            color: var(--muted);
-            margin-top: 0.6rem;
-            font-variant-numeric: tabular-nums;
-        }
-
-        /* Timeline */
-        .timeline {
-            display: flex;
-            border-radius: 8px;
-            overflow: hidden;
-            height: 40px;
-            margin: 1rem 0;
-        }
-
-        .timeline-segment {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.9);
-            position: relative;
-            overflow: hidden;
-            transition: opacity 0.3s;
-        }
-
+        .timeline { display: flex; border-radius: 8px; overflow: hidden; height: 40px; margin: 1rem 0; }
+        .timeline-segment { display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 600; color: rgba(255,255,255,0.9); position: relative; overflow: hidden; transition: opacity 0.3s; }
         .timeline-segment.past { opacity: 0.35; }
         .timeline-segment.active { opacity: 1; }
         .timeline-segment.future { opacity: 0.6; }
-
-        .timeline-segment .segment-fill {
-            position: absolute;
-            top: 0; left: 0; bottom: 0;
-            background: rgba(0,0,0,0.35);
-            transition: width 0.3s;
-        }
-
+        .timeline-segment .segment-fill { position: absolute; top: 0; left: 0; bottom: 0; background: rgba(0,0,0,0.35); transition: width 0.3s; }
         .timeline-segment span { position: relative; z-index: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 4px; }
 
-        /* Topic List */
         .topic-list { margin: 1rem 0; }
-
-        .topic-item {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.8rem;
-            border-radius: 10px;
-            margin-bottom: 0.4rem;
-            background: var(--card);
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .topic-item.active {
-            border-color: currentColor;
-            box-shadow: 0 0 15px rgba(99,102,241,0.1);
-        }
-
+        .topic-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem; border-radius: 10px; margin-bottom: 0.4rem; background: var(--card); border: 2px solid transparent; transition: all 0.3s; }
+        .topic-item.active { border-color: currentColor; box-shadow: 0 0 15px rgba(99,102,241,0.1); }
         .topic-item.completed { opacity: 0.4; }
-
-        .topic-item .topic-dot {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
+        .topic-item .topic-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
         .topic-item .topic-info { flex: 1; min-width: 0; }
         .topic-item .topic-title { font-weight: 600; font-size: 0.9rem; }
         .topic-item .topic-time { font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
         .topic-item .topic-duration { font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; flex-shrink: 0; }
 
-        /* Controls */
-        .controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.6rem;
-            margin: 1.2rem 0;
-        }
-
-        .btn-control {
-            padding: 0.9rem 1rem;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.15s;
-            -webkit-appearance: none;
-        }
-
+        .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin: 1.2rem 0; }
+        .btn-control { padding: 0.9rem 1rem; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.15s; -webkit-appearance: none; }
         .btn-control:active { transform: scale(0.97); }
-
         .btn-start { background: linear-gradient(135deg, #22c55e, #16a34a); color: white; }
         .btn-pause { background: linear-gradient(135deg, #f59e0b, #d97706); color: white; }
         .btn-reset { background: var(--card); color: var(--muted); border: 1px solid var(--border); }
         .btn-skip { background: var(--card); color: var(--accent); border: 1px solid var(--accent); }
 
-        /* Warning state */
-        .warning-active {
-            animation: warningPulse 1s ease-in-out infinite;
-        }
-
-        @keyframes warningPulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
+        .warning-active { animation: warningPulse 1s ease-in-out infinite; }
+        @keyframes warningPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
 
         .warning-banner {
-            display: none;
-            text-align: center;
-            padding: 0.7rem;
-            background: rgba(245,158,11,0.15);
-            border: 1px solid rgba(245,158,11,0.3);
-            border-radius: 10px;
-            color: var(--warning);
-            font-weight: 600;
-            font-size: 0.9rem;
-            margin-bottom: 0.8rem;
-            animation: warningPulse 1s ease-in-out infinite;
+            display: none; text-align: center; padding: 0.7rem;
+            background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3);
+            border-radius: 10px; color: var(--warning); font-weight: 600; font-size: 0.9rem;
+            margin-bottom: 0.8rem; animation: warningPulse 1s ease-in-out infinite;
         }
-
         .warning-banner.visible { display: block; }
 
-        /* Finished */
-        .finished-overlay {
-            display: none;
-            text-align: center;
-            padding: 2rem 1rem;
-        }
-
+        .finished-overlay { display: none; text-align: center; padding: 2rem 1rem; }
         .finished-overlay.visible { display: block; }
         .finished-overlay h2 { font-size: 1.6rem; margin-bottom: 0.8rem; color: var(--success); }
         .finished-overlay p { color: var(--muted); margin-bottom: 1.5rem; }
 
-        /* Force portrait: show overlay when landscape */
-        .landscape-block {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: var(--bg);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            gap: 1rem;
-            text-align: center;
-            padding: 2rem;
-        }
-
+        /* Landscape block */
+        .landscape-block { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 9999; justify-content: center; align-items: center; flex-direction: column; gap: 1rem; text-align: center; padding: 2rem; }
         .landscape-block svg { width: 60px; height: 60px; }
         .landscape-block p { color: var(--muted); font-size: 1rem; }
+        @media (orientation: landscape) and (max-height: 500px) { .landscape-block { display: flex; } }
 
-        @media (orientation: landscape) and (max-height: 500px) {
-            .landscape-block { display: flex; }
-        }
+        /* Loading spinner */
+        .loading { text-align: center; padding: 4rem 1rem; }
+        .spinner { width: 32px; height: 32px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Mobile optimizations */
         @media (max-width: 400px) {
             .container { padding: 1rem 0.7rem; }
             .timer-circle { width: 200px; height: 200px; }
@@ -548,23 +523,20 @@
         </svg>
         <p>Bitte drehe dein Gerät<br>ins Hochformat</p>
     </div>
+
+    <button class="logout-btn" id="logoutBtn" onclick="handleLogout()">Abmelden</button>
+
     <div class="container">
         <div class="logo">
             <svg class="logo-icon" viewBox="0 0 56 56" fill="none">
-                <!-- outer ring -->
                 <circle cx="28" cy="28" r="25" stroke="url(#logoGrad)" stroke-width="3.5" fill="none"/>
-                <!-- tick marks -->
                 <line x1="28" y1="5" x2="28" y2="9" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
                 <line x1="28" y1="47" x2="28" y2="51" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
                 <line x1="5" y1="28" x2="9" y2="28" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
                 <line x1="47" y1="28" x2="51" y2="28" stroke="#6366f1" stroke-width="2" stroke-linecap="round"/>
-                <!-- minute hand -->
                 <line x1="28" y1="28" x2="28" y2="12" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
-                <!-- hour hand -->
                 <line x1="28" y1="28" x2="38" y2="20" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>
-                <!-- center dot -->
                 <circle cx="28" cy="28" r="2.5" fill="url(#logoGrad)"/>
-                <!-- colored arc segments representing topics -->
                 <path d="M28 6 A22 22 0 0 1 49 22" stroke="#ec4899" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
                 <path d="M49 22 A22 22 0 0 1 44 44" stroke="#14b8a6" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
                 <path d="M44 44 A22 22 0 0 1 28 50" stroke="#f59e0b" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
@@ -578,6 +550,77 @@
             <div class="logo-text">
                 <span class="logo-name">Exam<span class="logo-highlight">Flow</span></span>
                 <span class="logo-tagline">Dein Prüfungsbegleiter</span>
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div id="loadingView" class="loading">
+            <div class="spinner"></div>
+            <p style="color:var(--muted);font-size:0.85rem;">Wird geladen...</p>
+        </div>
+
+        <!-- Landing Page -->
+        <div id="landingView">
+            <div class="hero-text">
+                <h2>Deine mündliche Prüfung<br>perfekt im Griff</h2>
+                <p>Behalte die Zeit im Blick, wechsle nahtlos zwischen Fachgebieten und werde rechtzeitig informiert.</p>
+            </div>
+
+            <div class="features">
+                <div class="feature">
+                    <div class="feature-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">&#9202;</div>
+                    <div class="feature-text">Visuelle Timer mit Countdown pro Fachgebiet</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon" style="background:rgba(245,158,11,0.15);color:#f59e0b;">&#9888;</div>
+                    <div class="feature-text">15-Sekunden-Warnung vor jedem Themenwechsel</div>
+                </div>
+                <div class="feature">
+                    <div class="feature-icon" style="background:rgba(34,197,94,0.15);color:#22c55e;">&#9889;</div>
+                    <div class="feature-text">Bildschirm bleibt an, keine Ablenkungen</div>
+                </div>
+            </div>
+
+            <div class="price-card">
+                <div class="price-amount">CHF 19.—</div>
+                <div class="price-label">Einmalige Zahlung · Lebenslanger Zugang</div>
+
+                <div class="purchase-form">
+                    <input type="email" id="purchaseEmail" placeholder="Deine E-Mail-Adresse" autocomplete="email">
+                    <div class="purchase-error" id="purchaseError"></div>
+                    <button class="btn-buy" id="btnBuy" onclick="startPurchase()">Jetzt kaufen mit Twint</button>
+                </div>
+            </div>
+
+            <div class="login-link">
+                Bereits gekauft? <a onclick="showLogin()">Hier einloggen</a>
+            </div>
+        </div>
+
+        <!-- Login View -->
+        <div id="loginView">
+            <div class="login-card">
+                <h2>Willkommen zurück</h2>
+                <p>Gib deine E-Mail-Adresse ein und wir senden dir einen Login-Link.</p>
+                <input type="email" id="loginEmail" placeholder="Deine E-Mail-Adresse" autocomplete="email">
+                <div class="login-error" id="loginError"></div>
+                <button class="btn btn-primary" onclick="handleLogin()" style="margin-top:0.5rem;">Login-Link senden</button>
+                <div class="login-success" id="loginSuccess">
+                    Login-Link wurde gesendet! Prüfe dein E-Mail-Postfach und klicke auf den Link.
+                </div>
+            </div>
+            <div class="back-link">
+                <a onclick="showLanding()">Zurück zur Startseite</a>
+            </div>
+        </div>
+
+        <!-- Payment Success View -->
+        <div id="paymentSuccessView">
+            <div class="success-card">
+                <div class="success-icon" style="color:var(--success);">&#10003;</div>
+                <h2>Zahlung erfolgreich!</h2>
+                <p>Vielen Dank für deinen Kauf. Wir haben dir einen Login-Link an deine E-Mail-Adresse gesendet. Prüfe dein Postfach und klicke auf den Link, um ExamFlow zu starten.</p>
+                <button class="btn btn-primary" onclick="showLogin()">Zum Login</button>
             </div>
         </div>
 
@@ -628,7 +671,6 @@
             </div>
 
             <div class="timeline" id="timeline"></div>
-
             <div class="topic-list" id="topicListView"></div>
 
             <div class="controls" id="controls">
@@ -648,6 +690,168 @@
     </div>
 
     <script>
+        // ===== CONFIG =====
+        const SUPABASE_URL = 'https://lhuwbhrhipjzjfatgxj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxodXdiaHJoaXBqempqZmF0Z3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM0NzAwNDQsImV4cCI6MjA4OTA0NjA0NH0.AuEy67QgljjVjcDTLK3Fvb2qrOBQUJt3971SGBpVkto';
+        const APP_URL = 'https://wasersolutions.github.io/examflow/';
+
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // ===== VIEWS =====
+        const ALL_VIEWS = ['loadingView','landingView','loginView','paymentSuccessView','setupView','countdownView','timerView'];
+
+        function showView(id) {
+            ALL_VIEWS.forEach(v => {
+                document.getElementById(v).style.display = v === id ? 'block' : 'none';
+            });
+            document.getElementById('logoutBtn').style.display =
+                (id === 'setupView' || id === 'timerView' || id === 'countdownView') ? 'block' : 'none';
+        }
+
+        function showLanding() { showView('landingView'); }
+        function showLogin() { showView('loginView'); }
+
+        // ===== AUTH ROUTER =====
+        async function router() {
+            // Check for payment success redirect
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('payment') === 'success') {
+                window.history.replaceState({}, '', window.location.pathname);
+                showView('paymentSuccessView');
+                return;
+            }
+
+            const { data: { session } } = await sb.auth.getSession();
+
+            if (session) {
+                // Logged in — enforce single session
+                const sessionToken = localStorage.getItem('ef_session');
+                if (!sessionToken) {
+                    // First login on this device — create session
+                    const token = crypto.randomUUID();
+                    localStorage.setItem('ef_session', token);
+                    await sb.from('sessions').upsert({
+                        user_id: session.user.id,
+                        session_token: token,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'user_id' });
+                }
+                showView('setupView');
+                initApp();
+            } else {
+                showView('landingView');
+            }
+        }
+
+        // Periodic session check
+        async function checkSession() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) return;
+
+            const localToken = localStorage.getItem('ef_session');
+            const { data } = await sb.from('sessions')
+                .select('session_token')
+                .eq('user_id', session.user.id)
+                .single();
+
+            if (data && data.session_token !== localToken) {
+                localStorage.removeItem('ef_session');
+                await sb.auth.signOut();
+                showView('landingView');
+                alert('Du wurdest abgemeldet, da eine neue Anmeldung auf einem anderen Gerät stattfand.');
+            }
+        }
+
+        sb.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                const token = crypto.randomUUID();
+                localStorage.setItem('ef_session', token);
+                await sb.from('sessions').upsert({
+                    user_id: session.user.id,
+                    session_token: token,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' });
+                showView('setupView');
+                initApp();
+            }
+            if (event === 'SIGNED_OUT') {
+                showView('landingView');
+            }
+        });
+
+        // ===== PURCHASE =====
+        async function startPurchase() {
+            const email = document.getElementById('purchaseEmail').value.trim();
+            const errEl = document.getElementById('purchaseError');
+            const btn = document.getElementById('btnBuy');
+
+            if (!email || !email.includes('@')) {
+                errEl.textContent = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            errEl.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = 'Wird verarbeitet...';
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/functions/v1/create-mollie-payment`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await res.json();
+
+                if (data.checkoutUrl) {
+                    window.location.href = data.checkoutUrl;
+                } else {
+                    throw new Error(data.error || 'Zahlung konnte nicht erstellt werden.');
+                }
+            } catch (e) {
+                errEl.textContent = e.message;
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Jetzt kaufen mit Twint';
+            }
+        }
+
+        // ===== LOGIN =====
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const errEl = document.getElementById('loginError');
+            const successEl = document.getElementById('loginSuccess');
+
+            if (!email || !email.includes('@')) {
+                errEl.textContent = 'Bitte gib eine gültige E-Mail-Adresse ein.';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            errEl.style.display = 'none';
+
+            const { error } = await sb.auth.signInWithOtp({
+                email,
+                options: { emailRedirectTo: APP_URL }
+            });
+
+            if (error) {
+                errEl.textContent = error.message;
+                errEl.style.display = 'block';
+            } else {
+                successEl.style.display = 'block';
+            }
+        }
+
+        // ===== LOGOUT =====
+        async function handleLogout() {
+            localStorage.removeItem('ef_session');
+            await sb.auth.signOut();
+            showView('landingView');
+        }
+
+        // ===== TIMER APP (unchanged logic) =====
         const COLORS = [
             '#6366f1', '#ec4899', '#14b8a6', '#f59e0b', '#ef4444',
             '#8b5cf6', '#06b6d4', '#22c55e', '#f97316', '#3b82f6',
@@ -662,28 +866,31 @@
         let isPaused = false;
         let isRunning = false;
         let wakeLock = null;
+        let appInitialized = false;
+        let sessionCheckInterval = null;
 
         async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                }
-            } catch (e) { /* not supported or denied */ }
+            try { if ('wakeLock' in navigator) wakeLock = await navigator.wakeLock.request('screen'); }
+            catch (e) {}
         }
-
         async function releaseWakeLock() {
-            if (wakeLock) {
-                await wakeLock.release();
-                wakeLock = null;
-            }
+            if (wakeLock) { await wakeLock.release(); wakeLock = null; }
         }
 
-        // Re-acquire wake lock when tab becomes visible again
         document.addEventListener('visibilitychange', () => {
-            if (document.visibilityState === 'visible' && isRunning && !isPaused) {
-                requestWakeLock();
-            }
+            if (document.visibilityState === 'visible' && isRunning && !isPaused) requestWakeLock();
         });
+
+        function initApp() {
+            if (appInitialized) return;
+            appInitialized = true;
+            addTopic('Fachgebiet 1', 5);
+            addTopic('Fachgebiet 2', 5);
+            addTopic('Fachgebiet 3', 5);
+
+            // Check session every 60s
+            sessionCheckInterval = setInterval(checkSession, 60000);
+        }
 
         function addTopic(name = '', minutes = 5) {
             const id = Date.now() + Math.random();
@@ -691,23 +898,16 @@
             renderSetup();
         }
 
-        function removeTopic(id) {
-            topics = topics.filter(t => t.id !== id);
-            renderSetup();
-        }
+        function removeTopic(id) { topics = topics.filter(t => t.id !== id); renderSetup(); }
 
         function changeMinutes(id, delta) {
             const t = topics.find(t => t.id === id);
-            if (t) {
-                t.minutes = Math.max(1, t.minutes + delta);
-                renderSetup();
-            }
+            if (t) { t.minutes = Math.max(1, t.minutes + delta); renderSetup(); }
         }
 
         function updateTopicName(id, value) {
             const t = topics.find(t => t.id === id);
             if (t) t.name = value;
-            // Don't re-render to keep cursor position
         }
 
         function updateTotalTime() {
@@ -723,12 +923,12 @@
                     <input type="text" class="topic-name" placeholder="Fachgebiet-Name" value="${escapeHtml(t.name)}"
                         oninput="updateTopicName(${t.id}, this.value)">
                     <div class="minutes-control">
-                        <button class="btn-pm" onclick="changeMinutes(${t.id}, -1)">−</button>
+                        <button class="btn-pm" onclick="changeMinutes(${t.id}, -1)">&#8722;</button>
                         <div class="minutes-display">${t.minutes}</div>
                         <button class="btn-pm" onclick="changeMinutes(${t.id}, 1)">+</button>
                     </div>
                     <span class="minutes-label">Min.</span>
-                    <button class="btn-remove" onclick="removeTopic(${t.id})">✕</button>
+                    <button class="btn-remove" onclick="removeTopic(${t.id})">&#10005;</button>
                 </div>
             `).join('');
             updateTotalTime();
@@ -740,14 +940,7 @@
             return div.innerHTML;
         }
 
-        // Init with example topics
-        addTopic('Fachgebiet 1', 5);
-        addTopic('Fachgebiet 2', 5);
-        addTopic('Fachgebiet 3', 5);
-
-        function getTotalSeconds() {
-            return topics.reduce((s, t) => s + t.minutes * 60, 0);
-        }
+        function getTotalSeconds() { return topics.reduce((s, t) => s + t.minutes * 60, 0); }
 
         function formatTime(seconds) {
             const m = Math.floor(seconds / 60);
@@ -755,43 +948,25 @@
             return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
         }
 
-        // 5-second countdown before timer starts
         function startCountdown() {
             if (topics.length === 0) return;
             topics.forEach(t => { if (!t.name.trim()) t.name = 'Ohne Titel'; });
-
-            document.getElementById('setupView').style.display = 'none';
-            document.getElementById('countdownView').style.display = 'block';
-
+            showView('countdownView');
             let count = 5;
             const numEl = document.getElementById('countdownNumber');
             numEl.textContent = count;
-
             const cdInterval = setInterval(() => {
                 count--;
-                if (count <= 0) {
-                    clearInterval(cdInterval);
-                    document.getElementById('countdownView').style.display = 'none';
-                    startTimer();
-                } else {
-                    numEl.textContent = count;
-                }
+                if (count <= 0) { clearInterval(cdInterval); startTimer(); }
+                else numEl.textContent = count;
             }, 1000);
         }
 
         function startTimer() {
-            document.getElementById('timerView').style.display = 'block';
-
-            currentTopicIndex = 0;
-            topicElapsed = 0;
-            totalElapsed = 0;
-            isPaused = false;
-            isRunning = true;
-
-            renderTimeline();
-            renderTopicList();
-            updateDisplay();
-
+            showView('timerView');
+            currentTopicIndex = 0; topicElapsed = 0; totalElapsed = 0;
+            isPaused = false; isRunning = true;
+            renderTimeline(); renderTopicList(); updateDisplay();
             lastTick = Date.now();
             requestWakeLock();
             timerInterval = setInterval(tick, 100);
@@ -801,27 +976,16 @@
 
         function tick() {
             if (isPaused) { lastTick = Date.now(); return; }
-
             const now = Date.now();
             const delta = (now - lastTick) / 1000;
             lastTick = now;
-
-            topicElapsed += delta;
-            totalElapsed += delta;
-
-            const currentTopic = topics[currentTopicIndex];
-            const topicDuration = currentTopic.minutes * 60;
-
+            topicElapsed += delta; totalElapsed += delta;
+            const topicDuration = topics[currentTopicIndex].minutes * 60;
             if (topicElapsed >= topicDuration) {
-                topicElapsed = topicElapsed - topicDuration;
+                topicElapsed -= topicDuration;
                 currentTopicIndex++;
-
-                if (currentTopicIndex >= topics.length) {
-                    finishTimer();
-                    return;
-                }
+                if (currentTopicIndex >= topics.length) { finishTimer(); return; }
             }
-
             updateDisplay();
         }
 
@@ -829,27 +993,22 @@
             const topic = topics[currentTopicIndex];
             const topicDuration = topic.minutes * 60;
             const topicRemaining = Math.max(0, topicDuration - topicElapsed);
-            const totalTotal = getTotalSeconds();
-            const totalRemaining = Math.max(0, totalTotal - totalElapsed);
+            const totalRemaining = Math.max(0, getTotalSeconds() - totalElapsed);
             const color = COLORS[currentTopicIndex % COLORS.length];
 
             document.getElementById('currentTopicName').textContent = topic.name;
             document.getElementById('currentTopicName').style.color = color;
-            document.getElementById('currentTopicProgress').textContent =
-                `Thema ${currentTopicIndex + 1} von ${topics.length}`;
-
+            document.getElementById('currentTopicProgress').textContent = `Thema ${currentTopicIndex + 1} von ${topics.length}`;
             document.getElementById('timeRemaining').textContent = formatTime(topicRemaining);
             document.getElementById('totalRemaining').textContent = `Gesamt: ${formatTime(totalRemaining)}`;
 
             const ring = document.getElementById('progressRing');
-            const circumference = 2 * Math.PI * 124;
-            const progress = topicElapsed / topicDuration;
-            ring.style.strokeDasharray = circumference;
-            ring.style.strokeDashoffset = circumference * (1 - progress);
+            const circ = 2 * Math.PI * 124;
+            ring.style.strokeDasharray = circ;
+            ring.style.strokeDashoffset = circ * (1 - topicElapsed / topicDuration);
 
             const isWarning = topicRemaining <= 15 && topicRemaining > 0;
             const banner = document.getElementById('warningBanner');
-
             if (isWarning) {
                 ring.style.stroke = '#f59e0b';
                 document.getElementById('timeRemaining').style.color = '#f59e0b';
@@ -861,21 +1020,16 @@
                 banner.classList.remove('visible');
                 document.getElementById('timeRemaining').classList.remove('warning-active');
             }
-
-            updateTimeline();
-            renderTopicList();
+            updateTimeline(); renderTopicList();
         }
 
         function renderTimeline() {
             const total = getTotalSeconds();
-            const timeline = document.getElementById('timeline');
-            timeline.innerHTML = topics.map((t, i) => {
+            document.getElementById('timeline').innerHTML = topics.map((t, i) => {
                 const pct = (t.minutes * 60 / total) * 100;
-                return `<div class="timeline-segment" id="seg-${i}"
-                    style="width:${pct}%;background:${COLORS[i % COLORS.length]}">
+                return `<div class="timeline-segment" id="seg-${i}" style="width:${pct}%;background:${COLORS[i % COLORS.length]}">
                     <div class="segment-fill" id="segFill-${i}"></div>
-                    <span>${t.name.length > 10 ? t.name.slice(0, 8) + '…' : t.name}</span>
-                </div>`;
+                    <span>${t.name.length > 10 ? t.name.slice(0, 8) + '…' : t.name}</span></div>`;
             }).join('');
         }
 
@@ -884,125 +1038,68 @@
                 const seg = document.getElementById(`seg-${i}`);
                 const fill = document.getElementById(`segFill-${i}`);
                 if (!seg || !fill) return;
-
-                if (i < currentTopicIndex) {
-                    seg.className = 'timeline-segment past';
-                    fill.style.width = '100%';
-                } else if (i === currentTopicIndex) {
-                    seg.className = 'timeline-segment active';
-                    const pct = (topicElapsed / (t.minutes * 60)) * 100;
-                    fill.style.width = `${pct}%`;
-                } else {
-                    seg.className = 'timeline-segment future';
-                    fill.style.width = '0%';
-                }
+                if (i < currentTopicIndex) { seg.className = 'timeline-segment past'; fill.style.width = '100%'; }
+                else if (i === currentTopicIndex) { seg.className = 'timeline-segment active'; fill.style.width = `${(topicElapsed / (t.minutes * 60)) * 100}%`; }
+                else { seg.className = 'timeline-segment future'; fill.style.width = '0%'; }
             });
         }
 
         function renderTopicList() {
-            const list = document.getElementById('topicListView');
-            list.innerHTML = topics.map((t, i) => {
+            document.getElementById('topicListView').innerHTML = topics.map((t, i) => {
                 const dur = t.minutes * 60;
-                let status = '';
-                let timeText = formatTime(dur);
-
-                if (i < currentTopicIndex) {
-                    status = 'completed';
-                    timeText = 'Abgeschlossen';
-                } else if (i === currentTopicIndex) {
-                    status = 'active';
-                    const rem = Math.max(0, dur - topicElapsed);
-                    timeText = `${formatTime(rem)} verbleibend`;
-                }
-
+                let status = '', timeText = formatTime(dur);
+                if (i < currentTopicIndex) { status = 'completed'; timeText = 'Abgeschlossen'; }
+                else if (i === currentTopicIndex) { status = 'active'; timeText = `${formatTime(Math.max(0, dur - topicElapsed))} verbleibend`; }
                 return `<div class="topic-item ${status}" style="${status === 'active' ? `color:${COLORS[i % COLORS.length]}` : ''}">
                     <div class="topic-dot" style="background:${COLORS[i % COLORS.length]}"></div>
-                    <div class="topic-info">
-                        <div class="topic-title">${escapeHtml(t.name)}</div>
-                        <div class="topic-time">${timeText}</div>
-                    </div>
-                    <div class="topic-duration">${t.minutes} Min.</div>
-                </div>`;
+                    <div class="topic-info"><div class="topic-title">${escapeHtml(t.name)}</div><div class="topic-time">${timeText}</div></div>
+                    <div class="topic-duration">${t.minutes} Min.</div></div>`;
             }).join('');
         }
 
         function togglePause() {
             isPaused = !isPaused;
             const btn = document.getElementById('btnPauseResume');
-            if (isPaused) {
-                btn.textContent = 'Weiter';
-                btn.className = 'btn-control btn-start';
-                releaseWakeLock();
-            } else {
-                btn.textContent = 'Pause';
-                btn.className = 'btn-control btn-pause';
-                lastTick = Date.now();
-                requestWakeLock();
-            }
+            if (isPaused) { btn.textContent = 'Weiter'; btn.className = 'btn-control btn-start'; releaseWakeLock(); }
+            else { btn.textContent = 'Pause'; btn.className = 'btn-control btn-pause'; lastTick = Date.now(); requestWakeLock(); }
         }
 
         function skipTopic() {
-            const currentDuration = topics[currentTopicIndex].minutes * 60;
-            const remaining = currentDuration - topicElapsed;
-            totalElapsed += remaining;
-            topicElapsed = 0;
-            currentTopicIndex++;
-
-            if (currentTopicIndex >= topics.length) {
-                finishTimer();
-                return;
-            }
-
-            lastTick = Date.now();
-            updateDisplay();
+            totalElapsed += topics[currentTopicIndex].minutes * 60 - topicElapsed;
+            topicElapsed = 0; currentTopicIndex++;
+            if (currentTopicIndex >= topics.length) { finishTimer(); return; }
+            lastTick = Date.now(); updateDisplay();
         }
 
         function finishTimer() {
-            clearInterval(timerInterval);
-            isRunning = false;
-            releaseWakeLock();
+            clearInterval(timerInterval); isRunning = false; releaseWakeLock();
             document.getElementById('controls').style.display = 'none';
             document.getElementById('warningBanner').classList.remove('visible');
-
             const overlay = document.getElementById('finishedOverlay');
             overlay.classList.add('visible');
-            overlay.querySelector('#finishedSummary').textContent =
-                `Alle ${topics.length} Fachgebiete wurden in ${formatTime(getTotalSeconds())} behandelt.`;
-
+            overlay.querySelector('#finishedSummary').textContent = `Alle ${topics.length} Fachgebiete wurden in ${formatTime(getTotalSeconds())} behandelt.`;
             topics.forEach((_, i) => {
-                const seg = document.getElementById(`seg-${i}`);
-                const fill = document.getElementById(`segFill-${i}`);
-                if (seg) seg.className = 'timeline-segment past';
-                if (fill) fill.style.width = '100%';
+                const seg = document.getElementById(`seg-${i}`); const fill = document.getElementById(`segFill-${i}`);
+                if (seg) seg.className = 'timeline-segment past'; if (fill) fill.style.width = '100%';
             });
             renderTopicList();
         }
 
         function resetTimer() {
-            clearInterval(timerInterval);
-            isRunning = false;
-            releaseWakeLock();
-            isPaused = false;
-
-            document.getElementById('setupView').style.display = 'block';
-            document.getElementById('timerView').style.display = 'none';
-            document.getElementById('countdownView').style.display = 'none';
+            clearInterval(timerInterval); isRunning = false; releaseWakeLock(); isPaused = false;
+            showView('setupView');
             document.getElementById('controls').style.display = 'grid';
             document.getElementById('finishedOverlay').classList.remove('visible');
             document.getElementById('warningBanner').classList.remove('visible');
-
             renderSetup();
         }
 
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
-        }
+        // ===== INIT =====
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
 
-        // Lock orientation to portrait
-        if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock('portrait').catch(() => {});
-        }
+        // Start router
+        router();
     </script>
 </body>
 </html>
