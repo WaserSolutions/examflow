@@ -1,6 +1,9 @@
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const MOLLIE_API_KEY = Deno.env.get('MOLLIE_API_KEY')!
+const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const APP_URL = 'https://examflowapp.waser.solutions/'
 const WEBHOOK_URL = 'https://lhuwbhrhipjzjjfatgxj.supabase.co/functions/v1/mollie-webhook'
 const ALLOWED_ORIGIN = 'https://examflowapp.waser.solutions'
@@ -50,6 +53,24 @@ serve(async (req) => {
     // Email validation
     if (!email || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254) {
       return new Response(JSON.stringify({ error: 'Ungültige E-Mail-Adresse.' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      })
+    }
+
+    // Check if email already has a paid license
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false }
+    })
+    const { data: existingPayment } = await supabase
+      .from('payments')
+      .select('id')
+      .eq('email', email)
+      .eq('status', 'paid')
+      .maybeSingle()
+
+    if (existingPayment) {
+      return new Response(JSON.stringify({ error: 'Du hast bereits eine Lizenz. Bitte melde dich über "Hier einloggen" an.' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
