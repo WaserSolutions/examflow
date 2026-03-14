@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExamFlow — Dein Prüfungsbegleiter für mündliche Prüfungen</title>
+    <meta name="description" content="Behalte bei mündlichen Prüfungen die Zeit im Griff. Visueller Timer pro Fachgebiet, automatische Warnungen und perfektes Timing.">
+    <meta name="theme-color" content="#0f1117">
+    <link rel="icon" href="icon-192.png">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --bg: #0f1117;
+            --card: #1a1d27;
+            --border: #2a2d3a;
+            --text: #e4e4e7;
+            --muted: #71717a;
+            --accent: #6366f1;
+        }
+
+        body {
+            font-family: -apple-system, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Nav */
+        nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 1.2rem 1.5rem;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            text-decoration: none;
+        }
+
+        .nav-logo svg { width: 32px; height: 32px; }
+
+        .nav-logo span {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+
+        .nav-logo .hl {
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-cta {
+            padding: 0.5rem 1.2rem;
+            background: var(--accent);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: opacity 0.2s;
+        }
+
+        .nav-cta:hover { opacity: 0.9; }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem 3rem;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.35rem 1rem;
+            background: rgba(99,102,241,0.12);
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #818cf8;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 1.2rem;
+            letter-spacing: -0.03em;
+        }
+
+        .hero h1 .gradient {
+            background: linear-gradient(135deg, #6366f1, #a78bfa, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero {
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-hero-primary {
+            background: linear-gradient(135deg, #6366f1, #818cf8);
+            color: white;
+            box-shadow: 0 4px 24px rgba(99,102,241,0.3);
+        }
+
+        .btn-hero-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(99,102,241,0.4);
+        }
+
+        .btn-hero-secondary {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-hero-secondary:hover { border-color: var(--muted); }
+
+        .hero-price {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .hero-price strong { color: var(--text); }
+
+        /* Phone mockup */
+        .mockup-section {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-frame {
+            width: 280px;
+            background: var(--card);
+            border-radius: 32px;
+            border: 3px solid var(--border);
+            padding: 1rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .phone-screen {
+            background: var(--bg);
+            border-radius: 22px;
+            padding: 1.2rem 0.8rem;
+            min-height: 400px;
+        }
+
+        .mock-header { text-align: center; margin-bottom: 1rem; }
+        .mock-topic { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+        .mock-name { font-size: 1.2rem; font-weight: 700; color: #6366f1; margin: 0.2rem 0; }
+        .mock-sub { font-size: 0.7rem; color: var(--muted); }
+
+        .mock-circle {
+            width: 160px; height: 160px;
+            margin: 0.8rem auto;
+            position: relative;
+        }
+
+        .mock-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .mock-circle .bg-r { fill: none; stroke: var(--border); stroke-width: 6; }
+        .mock-circle .fg-r { fill: none; stroke: #6366f1; stroke-width: 6; stroke-linecap: round; stroke-dasharray: 440; stroke-dashoffset: 132; }
+
+        .mock-time {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%); text-align: center;
+        }
+        .mock-time .big { font-size: 1.8rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+        .mock-time .small { font-size: 0.6rem; color: var(--muted); }
+
+        .mock-timeline {
+            display: flex; border-radius: 6px; overflow: hidden; height: 24px; margin: 0.8rem 0;
+        }
+        .mock-seg { display: flex; align-items: center; justify-content: center; font-size: 0.5rem; font-weight: 600; color: rgba(255,255,255,0.8); }
+
+        .mock-items { display: flex; flex-direction: column; gap: 0.4rem; }
+        .mock-item {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.5rem; background: var(--card); border-radius: 8px;
+            font-size: 0.7rem;
+        }
+        .mock-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+        .mock-item-text { flex: 1; }
+        .mock-item-time { color: var(--muted); font-variant-numeric: tabular-nums; }
+
+        /* Features */
+        .features {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        .features-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .features-sub {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 3rem;
+            font-size: 1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .feature-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: border-color 0.3s;
+        }
+
+        .feature-card:hover { border-color: rgba(99,102,241,0.4); }
+
+        .feature-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .feature-card p { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+
+        /* How it works */
+        .how {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+        }
+
+        .how-title {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 2.5rem;
+        }
+
+        .steps { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .step {
+            display: flex;
+            gap: 1.2rem;
+            align-items: flex-start;
+        }
+
+        .step-num {
+            width: 40px; height: 40px;
+            border-radius: 12px;
+            background: rgba(99,102,241,0.12);
+            color: #818cf8;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+
+        .step h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; }
+        .step p { font-size: 0.85rem; color: var(--muted); }
+
+        /* CTA */
+        .cta {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 4rem 1.5rem;
+            text-align: center;
+        }
+
+        .cta-card {
+            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(168,139,250,0.08));
+            border: 1px solid rgba(99,102,241,0.25);
+            border-radius: 24px;
+            padding: 3rem 2rem;
+        }
+
+        .cta-card h2 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .cta-card p {
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .cta-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.3rem;
+        }
+
+        .cta-price-sub {
+            color: var(--muted);
+            font-size: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            color: #3a3d4a;
+            font-size: 0.75rem;
+            border-top: 1px solid var(--border);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        footer a { color: var(--muted); text-decoration: none; }
+        footer a:hover { color: var(--text); }
+
+        /* Glow effect */
+        .glow {
+            position: absolute;
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(99,102,241,0.12) 0%, transparent 70%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .hero { position: relative; }
+        .hero .glow { top: -100px; left: 50%; transform: translateX(-50%); }
+
+        @media (max-width: 600px) {
+            .hero { padding: 3rem 1rem 2rem; }
+            .features { padding: 3rem 1rem; }
+            .how { padding: 3rem 1rem; }
+            .cta { padding: 3rem 1rem; }
+            .cta-card { padding: 2rem 1.2rem; }
+            .phone-frame { width: 240px; }
+            .mock-circle { width: 130px; height: 130px; }
+            .mock-time .big { font-size: 1.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="#" class="nav-logo">
+        <svg viewBox="0 0 56 56" fill="none">
+            <circle cx="28" cy="28" r="25" stroke="url(#ng)" stroke-width="3.5" fill="none"/>
+            <line x1="28" y1="28" x2="28" y2="12" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="28" y1="28" x2="38" y2="20" stroke="#6366f1" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="28" cy="28" r="2.5" fill="url(#ng)"/>
+            <path d="M28 6 A22 22 0 0 1 49 22" stroke="#ec4899" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M49 22 A22 22 0 0 1 44 44" stroke="#14b8a6" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <path d="M44 44 A22 22 0 0 1 28 50" stroke="#f59e0b" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.7"/>
+            <defs><linearGradient id="ng" x1="0" y1="0" x2="56" y2="56"><stop offset="0%" stop-color="#6366f1"/><stop offset="100%" stop-color="#a78bfa"/></linearGradient></defs>
+        </svg>
+        <span>Exam<span class="hl">Flow</span></span>
+    </a>
+    <a href="index.html" class="nav-cta">Jetzt starten</a>
+</nav>
+
+<section class="hero">
+    <div class="glow"></div>
+    <div class="hero-badge">Neu: Jetzt als Web-App verfügbar</div>
+    <h1>Deine mündliche Prüfung.<br><span class="gradient">Perfekt getimed.</span></h1>
+    <p>ExamFlow hilft dir, die Zeit bei mündlichen Prüfungen im Blick zu behalten — Fachgebiet für Fachgebiet, Sekunde für Sekunde.</p>
+    <div class="hero-buttons">
+        <a href="index.html" class="btn-hero btn-hero-primary">Jetzt kaufen</a>
+        <a href="#features" class="btn-hero btn-hero-secondary">Mehr erfahren</a>
+    </div>
+    <div class="hero-price">Einmalig <strong>CHF 19.—</strong> · Lebenslanger Zugang</div>
+</section>
+
+<section class="mockup-section">
+    <div class="phone-frame">
+        <div class="phone-screen">
+            <div class="mock-header">
+                <div class="mock-topic">Aktuelles Fachgebiet</div>
+                <div class="mock-name">Pharmakologie</div>
+                <div class="mock-sub">Thema 2 von 4</div>
+            </div>
+            <div class="mock-circle">
+                <svg viewBox="0 0 160 160">
+                    <circle class="bg-r" cx="80" cy="80" r="70"/>
+                    <circle class="fg-r" cx="80" cy="80" r="70"/>
+                </svg>
+                <div class="mock-time">
+                    <div class="big">03:42</div>
+                    <div class="small">verbleibend</div>
+                </div>
+            </div>
+            <div class="mock-timeline">
+                <div class="mock-seg" style="width:25%;background:#6366f1;opacity:0.4;">Anatomie</div>
+                <div class="mock-seg" style="width:25%;background:#ec4899;">Pharma</div>
+                <div class="mock-seg" style="width:30%;background:#14b8a6;opacity:0.6;">Pathologie</div>
+                <div class="mock-seg" style="width:20%;background:#f59e0b;opacity:0.6;">Chirurgie</div>
+            </div>
+            <div class="mock-items">
+                <div class="mock-item" style="opacity:0.4;">
+                    <div class="mock-dot" style="background:#6366f1;"></div>
+                    <div class="mock-item-text">Anatomie</div>
+                    <div class="mock-item-time">Abgeschlossen</div>
+                </div>
+                <div class="mock-item" style="border:1px solid #ec4899;">
+                    <div class="mock-dot" style="background:#ec4899;"></div>
+                    <div class="mock-item-text" style="font-weight:600;color:#ec4899;">Pharmakologie</div>
+                    <div class="mock-item-time">03:42</div>
+                </div>
+                <div class="mock-item">
+                    <div class="mock-dot" style="background:#14b8a6;"></div>
+                    <div class="mock-item-text">Pathologie</div>
+                    <div class="mock-item-time">08:00</div>
+                </div>
+                <div class="mock-item">
+                    <div class="mock-dot" style="background:#f59e0b;"></div>
+                    <div class="mock-item-text">Chirurgie</div>
+                    <div class="mock-item-time">05:00</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features" id="features">
+    <h2 class="features-title">Alles was du brauchst</h2>
+    <p class="features-sub">Konzentriere dich auf den Inhalt — ExamFlow kümmert sich um die Zeit.</p>
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(99,102,241,0.12);color:#818cf8;">&#9202;</div>
+            <h3>Timer pro Fachgebiet</h3>
+            <p>Definiere beliebig viele Fachgebiete mit individuellen Zeitlimits. Der Timer wechselt automatisch zum nächsten Thema.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(245,158,11,0.12);color:#f59e0b;">&#9888;</div>
+            <h3>15-Sekunden-Warnung</h3>
+            <p>Visueller Alarm 15 Sekunden vor jedem Themenwechsel. So wirst du nie überrascht und kannst sanft überleiten.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(236,72,153,0.12);color:#ec4899;">&#9899;</div>
+            <h3>Visuelle Timeline</h3>
+            <p>Farbcodierte Fortschrittsanzeige über alle Fachgebiete. Auf einen Blick siehst du, wo du stehst.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(34,197,94,0.12);color:#22c55e;">&#9889;</div>
+            <h3>Display bleibt an</h3>
+            <p>Wake Lock Technologie verhindert, dass dein Handy in den Standby geht. Der Timer läuft zuverlässig durch.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(20,184,166,0.12);color:#14b8a6;">&#128241;</div>
+            <h3>Optimiert fürs Handy</h3>
+            <p>Installiere ExamFlow als App auf deinem Homescreen. Funktioniert im Vollbild — wie eine native App.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon" style="background:rgba(139,92,246,0.12);color:#8b5cf6;">&#128274;</div>
+            <h3>Hochformat gesperrt</h3>
+            <p>Die Anzeige bleibt immer im Hochformat — egal wie du dein Handy hältst. Kein versehentliches Drehen.</p>
+        </div>
+    </div>
+</section>
+
+<section class="how">
+    <h2 class="how-title">So einfach geht's</h2>
+    <div class="steps">
+        <div class="step">
+            <div class="step-num">1</div>
+            <div>
+                <h4>Fachgebiete einrichten</h4>
+                <p>Benenne deine Prüfungsthemen und lege die Minutenzahl pro Fachgebiet fest.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">2</div>
+            <div>
+                <h4>Timer starten</h4>
+                <p>Ein 5-Sekunden-Countdown gibt dir Zeit, dich vorzubereiten. Dann geht's los.</p>
+            </div>
+        </div>
+        <div class="step">
+            <div class="step-num">3</div>
+            <div>
+                <h4>Prüfung meistern</h4>
+                <p>Behalte die Übersicht mit dem visuellen Timer. 15 Sekunden vor jedem Wechsel wirst du gewarnt.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta">
+    <div class="cta-card">
+        <h2>Bereit für deine Prüfung?</h2>
+        <p>Starte jetzt mit ExamFlow und geh selbstsicher in deine mündliche Prüfung.</p>
+        <div class="cta-price">CHF 19.—</div>
+        <div class="cta-price-sub">Einmalige Zahlung · Kein Abo · Lebenslanger Zugang</div>
+        <a href="index.html" class="btn-hero btn-hero-primary" style="display:inline-flex;">Jetzt kaufen</a>
+    </div>
+</section>
+
+<footer>
+    <p>v1.0 · by Daniela Waser · <a href="mailto:info@waser.solutions">info@waser.solutions</a></p>
+</footer>
+
+</body>
+</html>
