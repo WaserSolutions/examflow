@@ -779,6 +779,31 @@
             }
         });
 
+        // ===== ERROR TRANSLATIONS =====
+        function translateError(msg) {
+            if (!msg) return 'Ein Fehler ist aufgetreten.';
+            const m = msg.toLowerCase();
+            if (m.includes('security purposes') || m.includes('rate limit'))
+                return 'Aus Sicherheitsgründen kannst du dies erst in einer Minute erneut versuchen.';
+            if (m.includes('email not confirmed'))
+                return 'Deine E-Mail-Adresse wurde noch nicht bestätigt.';
+            if (m.includes('invalid login'))
+                return 'Ungültige Anmeldedaten.';
+            if (m.includes('user not found'))
+                return 'Kein Konto mit dieser E-Mail gefunden.';
+            if (m.includes('email rate limit'))
+                return 'Zu viele E-Mails gesendet. Bitte warte einen Moment.';
+            if (m.includes('unable to validate'))
+                return 'Der Link ist abgelaufen. Bitte fordere einen neuen an.';
+            if (m.includes('token has expired') || m.includes('otp has expired'))
+                return 'Der Login-Link ist abgelaufen. Bitte fordere einen neuen an.';
+            if (m.includes('signups not allowed'))
+                return 'Registrierung ist nicht möglich. Bitte kaufe zuerst eine Lizenz.';
+            if (m.includes('network') || m.includes('fetch'))
+                return 'Netzwerkfehler. Bitte prüfe deine Internetverbindung.';
+            return msg;
+        }
+
         // ===== PURCHASE =====
         async function startPurchase() {
             const email = document.getElementById('purchaseEmail').value.trim();
@@ -810,7 +835,7 @@
                     throw new Error(data.error || 'Zahlung konnte nicht erstellt werden.');
                 }
             } catch (e) {
-                errEl.textContent = e.message;
+                errEl.textContent = translateError(e.message);
                 errEl.style.display = 'block';
                 btn.disabled = false;
                 btn.textContent = 'Jetzt kaufen mit Twint';
@@ -837,7 +862,7 @@
             });
 
             if (error) {
-                errEl.textContent = error.message;
+                errEl.textContent = translateError(error.message);
                 errEl.style.display = 'block';
             } else {
                 successEl.style.display = 'block';
