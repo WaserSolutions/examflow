@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Prüfungs-Timer</title>
+    <title>ExamFlow</title>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f1117">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
@@ -482,6 +485,28 @@
         .finished-overlay h2 { font-size: 1.6rem; margin-bottom: 0.8rem; color: var(--success); }
         .finished-overlay p { color: var(--muted); margin-bottom: 1.5rem; }
 
+        /* Force portrait: show overlay when landscape */
+        .landscape-block {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1rem;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .landscape-block svg { width: 60px; height: 60px; }
+        .landscape-block p { color: var(--muted); font-size: 1rem; }
+
+        @media (orientation: landscape) and (max-height: 500px) {
+            .landscape-block { display: flex; }
+        }
+
         /* Mobile optimizations */
         @media (max-width: 400px) {
             .container { padding: 1rem 0.7rem; }
@@ -501,6 +526,12 @@
     </style>
 </head>
 <body>
+    <div class="landscape-block">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round">
+            <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/>
+        </svg>
+        <p>Bitte drehe dein Gerät<br>ins Hochformat</p>
+    </div>
     <div class="container">
         <div class="logo">
             <svg class="logo-icon" viewBox="0 0 56 56" fill="none">
@@ -943,6 +974,16 @@
             document.getElementById('warningBanner').classList.remove('visible');
 
             renderSetup();
+        }
+
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        // Lock orientation to portrait
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock('portrait').catch(() => {});
         }
     </script>
 </body>
