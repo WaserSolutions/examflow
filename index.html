@@ -706,8 +706,8 @@
                     <input type="text" id="loginOtp" placeholder="Code eingeben" maxlength="6" inputmode="numeric" autocomplete="one-time-code" style="text-align:center;font-size:1.2rem;letter-spacing:0.3rem;font-weight:700;">
                     <div class="login-error" id="otpError"></div>
                     <button class="btn btn-primary" onclick="verifyOtp()" style="margin-top:0.5rem;">Einloggen</button>
-                    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;align-items:center;">
-                        <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);font-size:0.8rem;text-decoration:none;">Neuen Code anfordern</a>
+                    <div style="margin-top:1.2rem;display:flex;flex-direction:column;gap:0.6rem;align-items:center;">
+                        <span style="color:var(--muted);font-size:0.8rem;">Code nicht erhalten oder abgelaufen? <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);text-decoration:none;">Erneut senden</a></span>
                         <a href="javascript:void(0)" onclick="backToEmail()" style="color:var(--muted);font-size:0.8rem;text-decoration:none;">Andere E-Mail verwenden</a>
                     </div>
                 </div>
@@ -951,9 +951,9 @@
             if (m.includes('email rate limit'))
                 return 'Zu viele E-Mails gesendet. Bitte warte einen Moment.';
             if (m.includes('unable to validate'))
-                return 'Der Link ist abgelaufen. Bitte fordere einen neuen an.';
+                return 'Der Code ist ungültig. Bitte fordere einen neuen an.';
             if (m.includes('token has expired') || m.includes('otp has expired'))
-                return 'Der Login-Link ist abgelaufen. Bitte fordere einen neuen an.';
+                return 'Der Code ist abgelaufen. Bitte fordere einen neuen an.';
             if (m.includes('signups not allowed'))
                 return 'Registrierung ist nicht möglich. Bitte kaufe zuerst eine Lizenz.';
             if (m.includes('network') || m.includes('fetch'))
@@ -1039,15 +1039,17 @@
 
             errEl.style.display = 'none';
 
-            const { error } = await sb.auth.verifyOtp({
+            const { data, error } = await sb.auth.verifyOtp({
                 email: loginEmailValue,
                 token: otp,
-                type: 'email'
+                type: 'magiclink'
             });
 
             if (error) {
                 errEl.textContent = translateError(error.message);
                 errEl.style.display = 'block';
+            } else if (data?.session) {
+                // Login successful — onAuthStateChange will handle the rest
             }
         }
 
