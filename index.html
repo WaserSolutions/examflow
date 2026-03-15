@@ -706,7 +706,8 @@
                     <input type="text" id="loginOtp" placeholder="Code eingeben" maxlength="6" inputmode="numeric" autocomplete="one-time-code" style="text-align:center;font-size:1.2rem;letter-spacing:0.3rem;font-weight:700;">
                     <div class="login-error" id="otpError"></div>
                     <button class="btn btn-primary" onclick="verifyOtp()" style="margin-top:0.5rem;">Einloggen</button>
-                    <div style="margin-top:1rem;">
+                    <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;align-items:center;">
+                        <a href="javascript:void(0)" onclick="resendCode()" style="color:var(--accent);font-size:0.8rem;text-decoration:none;">Neuen Code anfordern</a>
                         <a href="javascript:void(0)" onclick="backToEmail()" style="color:var(--muted);font-size:0.8rem;text-decoration:none;">Andere E-Mail verwenden</a>
                     </div>
                 </div>
@@ -1047,6 +1048,24 @@
             if (error) {
                 errEl.textContent = translateError(error.message);
                 errEl.style.display = 'block';
+            }
+        }
+
+        async function resendCode() {
+            const errEl = document.getElementById('otpError');
+            errEl.style.display = 'none';
+            document.getElementById('loginOtp').value = '';
+
+            const { error } = await sb.auth.signInWithOtp({ email: loginEmailValue });
+
+            if (error) {
+                errEl.textContent = translateError(error.message);
+                errEl.style.display = 'block';
+            } else {
+                errEl.style.display = 'block';
+                errEl.style.color = 'var(--success)';
+                errEl.textContent = 'Neuer Code wurde gesendet!';
+                setTimeout(() => { errEl.style.display = 'none'; errEl.style.color = 'var(--danger)'; }, 3000);
             }
         }
 
