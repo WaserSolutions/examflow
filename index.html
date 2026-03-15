@@ -1039,17 +1039,37 @@
 
             errEl.style.display = 'none';
 
-            const { data, error } = await sb.auth.verifyOtp({
+            // Try both types — Supabase may treat it as either
+            let result = await sb.auth.verifyOtp({
                 email: loginEmailValue,
                 token: otp,
-                type: 'magiclink'
+                type: 'email'
             });
 
-            if (error) {
-                errEl.textContent = translateError(error.message);
+            if (result.error) {
+                result = await sb.auth.verifyOtp({
+                    email: loginEmailValue,
+                    token: otp,
+                    type: 'magiclink'
+                });
+            }
+
+            if (result.error) {
+                errEl.textContent = translateError(result.error.message);
                 errEl.style.display = 'block';
-            } else if (data?.session) {
-                // Login successful — onAuthStateChange will handle the rest
+            } else if (result.data?.session) {
+                // Login successful — set session and show app
+                const session = result.data.session;
+                const token = crypto.randomUUID();
+                localStorage.setItem('ef_session', token);
+                await sb.from('sessions').upsert({
+                    user_id: session.user.id,
+                    session_token: token,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' }).catch(() => {});
+                showView('setupView');
+                initApp();
+                setTimeout(showInstallPopup, 500);
             }
         }
 
