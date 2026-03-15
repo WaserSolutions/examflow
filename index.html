@@ -1324,7 +1324,12 @@
         }
 
         // ===== INIT =====
-        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').then(reg => {
+                // Check for updates on every page load
+                reg.update();
+            });
+        }
         if (screen.orientation && screen.orientation.lock) screen.orientation.lock('portrait').catch(() => {});
 
         // Start router
