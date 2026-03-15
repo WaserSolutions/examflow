@@ -849,35 +849,49 @@
 
         // ===== AUTH ROUTER =====
         async function router() {
-            // Check for payment success redirect
-            const params = new URLSearchParams(window.location.search);
-            if (params.get('payment') === 'success') {
-                window.history.replaceState({}, '', window.location.pathname);
-                showView('paymentSuccessView');
-                return;
-            }
-
-            const { data: { session } } = await sb.auth.getSession();
-
-            if (session) {
-                // Logged in — enforce single session
-                const sessionToken = localStorage.getItem('ef_session');
-                if (!sessionToken) {
-                    // First login on this device — create session
-                    const token = crypto.randomUUID();
-                    localStorage.setItem('ef_session', token);
-                    await sb.from('sessions').upsert({
-                        user_id: session.user.id,
-                        session_token: token,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id' });
+            try {
+                // Check for payment success redirect
+                const params = new URLSearchParams(window.location.search);
+                if (params.get('payment') === 'success') {
+                    window.history.replaceState({}, '', window.location.pathname);
+                    showView('paymentSuccessView');
+                    return;
                 }
-                showView('setupView');
-                initApp();
-            } else {
+
+                const { data: { session }, error } = await sb.auth.getSession();
+
+                if (error) throw error;
+
+                if (session) {
+                    // Logged in — enforce single session
+                    const sessionToken = localStorage.getItem('ef_session');
+                    if (!sessionToken) {
+                        const token = crypto.randomUUID();
+                        localStorage.setItem('ef_session', token);
+                        await sb.from('sessions').upsert({
+                            user_id: session.user.id,
+                            session_token: token,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'user_id' }).catch(() => {});
+                    }
+                    showView('setupView');
+                    initApp();
+                } else {
+                    showView('landingView');
+                }
+            } catch (e) {
+                console.error('Router error:', e);
                 showView('landingView');
             }
         }
+
+        // Fallback: if loading takes more than 8 seconds, show landing
+        setTimeout(() => {
+            if (document.getElementById('loadingView').style.display !== 'none') {
+                console.warn('Loading timeout — showing landing');
+                showView('landingView');
+            }
+        }, 8000);
 
         // Periodic session check
         async function checkSession() {
@@ -899,19 +913,24 @@
         }
 
         sb.auth.onAuthStateChange(async (event, session) => {
-            if (event === 'SIGNED_IN' && session) {
-                const token = crypto.randomUUID();
-                localStorage.setItem('ef_session', token);
-                await sb.from('sessions').upsert({
-                    user_id: session.user.id,
-                    session_token: token,
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'user_id' });
-                showView('setupView');
-                initApp();
-                setTimeout(showInstallPopup, 500);
-            }
-            if (event === 'SIGNED_OUT') {
+            try {
+                if (event === 'SIGNED_IN' && session) {
+                    const token = crypto.randomUUID();
+                    localStorage.setItem('ef_session', token);
+                    await sb.from('sessions').upsert({
+                        user_id: session.user.id,
+                        session_token: token,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'user_id' }).catch(() => {});
+                    showView('setupView');
+                    initApp();
+                    setTimeout(showInstallPopup, 500);
+                }
+                if (event === 'SIGNED_OUT') {
+                    showView('landingView');
+                }
+            } catch (e) {
+                console.error('Auth state error:', e);
                 showView('landingView');
             }
         });
