@@ -894,35 +894,49 @@
             }
         }, 8000);
 
-        // Periodic session check
+        // Periodic session check — only enforced on fresh logins, not page reloads
         async function checkSession() {
-            const { data: { session } } = await sb.auth.getSession();
-            if (!session) return;
+            try {
+                const { data: { session } } = await sb.auth.getSession();
+                if (!session) return;
 
-            const localToken = localStorage.getItem('ef_session');
-            const { data } = await sb.from('sessions')
-                .select('session_token')
-                .eq('user_id', session.user.id)
-                .single();
+                const localToken = localStorage.getItem('ef_session');
+                if (!localToken) return;
 
-            if (data && data.session_token !== localToken) {
-                localStorage.removeItem('ef_session');
-                await sb.auth.signOut();
-                showView('landingView');
-                alert('Du wurdest abgemeldet, da eine neue Anmeldung auf einem anderen Gerät stattfand.');
+                const { data } = await sb.from('sessions')
+                    .select('session_token')
+                    .eq('user_id', session.user.id)
+                    .single();
+
+                // Only log out if server has a DIFFERENT token (meaning another device logged in)
+                if (data && data.session_token && data.session_token !== localToken) {
+                    localStorage.removeItem('ef_session');
+                    await sb.auth.signOut();
+                    showView('landingView');
+                    alert('Du wurdest abgemeldet, da eine neue Anmeldung auf einem anderen Gerät stattfand.');
+                }
+            } catch (e) {
+                // Ignore network errors during session check
             }
         }
 
+        let verifyingOtp = false;
+
         sb.auth.onAuthStateChange(async (event, session) => {
+            // Don't interfere during OTP verification
+            if (verifyingOtp) return;
             try {
                 if (event === 'SIGNED_IN' && session) {
-                    const token = crypto.randomUUID();
-                    localStorage.setItem('ef_session', token);
-                    await sb.from('sessions').upsert({
-                        user_id: session.user.id,
-                        session_token: token,
-                        updated_at: new Date().toISOString()
-                    }, { onConflict: 'user_id' }).catch(() => {});
+                    // Only create new session token if we don't have one yet
+                    if (!localStorage.getItem('ef_session')) {
+                        const token = crypto.randomUUID();
+                        localStorage.setItem('ef_session', token);
+                        await sb.from('sessions').upsert({
+                            user_id: session.user.id,
+                            session_token: token,
+                            updated_at: new Date().toISOString()
+                        }, { onConflict: 'user_id' }).catch(() => {});
+                    }
                     showView('setupView');
                     initApp();
                     setTimeout(showInstallPopup, 500);
@@ -932,7 +946,6 @@
                 }
             } catch (e) {
                 console.error('Auth state error:', e);
-                showView('landingView');
             }
         });
 
@@ -1038,39 +1051,41 @@
             }
 
             errEl.style.display = 'none';
+            verifyingOtp = true;
 
-            // Try both types — Supabase may treat it as either
-            let result = await sb.auth.verifyOtp({
-                email: loginEmailValue,
-                token: otp,
-                type: 'email'
-            });
+            // Try email type first, then magiclink
+            const types = ['email', 'magiclink'];
+            let lastError = null;
 
-            if (result.error) {
-                result = await sb.auth.verifyOtp({
+            for (const type of types) {
+                const { data, error } = await sb.auth.verifyOtp({
                     email: loginEmailValue,
                     token: otp,
-                    type: 'magiclink'
+                    type
                 });
+
+                if (!error && data?.session) {
+                    // Login successful
+                    verifyingOtp = false;
+                    const session = data.session;
+                    const token = crypto.randomUUID();
+                    localStorage.setItem('ef_session', token);
+                    await sb.from('sessions').upsert({
+                        user_id: session.user.id,
+                        session_token: token,
+                        updated_at: new Date().toISOString()
+                    }, { onConflict: 'user_id' }).catch(() => {});
+                    showView('setupView');
+                    initApp();
+                    setTimeout(showInstallPopup, 500);
+                    return;
+                }
+                lastError = error;
             }
 
-            if (result.error) {
-                errEl.textContent = translateError(result.error.message);
-                errEl.style.display = 'block';
-            } else if (result.data?.session) {
-                // Login successful — set session and show app
-                const session = result.data.session;
-                const token = crypto.randomUUID();
-                localStorage.setItem('ef_session', token);
-                await sb.from('sessions').upsert({
-                    user_id: session.user.id,
-                    session_token: token,
-                    updated_at: new Date().toISOString()
-                }, { onConflict: 'user_id' }).catch(() => {});
-                showView('setupView');
-                initApp();
-                setTimeout(showInstallPopup, 500);
-            }
+            verifyingOtp = false;
+            errEl.textContent = translateError(lastError?.message);
+            errEl.style.display = 'block';
         }
 
         async function resendCode() {
